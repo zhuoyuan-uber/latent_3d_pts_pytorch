@@ -26,7 +26,8 @@ def mlp_architecture_ala_iclr_18(n_pc_points, bneck_size, bneck_post_mlp=False):
                     'verbose': True
                     }
 
-    decoder_args = {'layer_sizes': [256, 256, np.prod(n_input)],
+    decoder_args = {'in_size': bneck_size,
+                    'layer_sizes': [256, 256, np.prod(n_input)],
                     'b_norm': False,
                     'b_norm_finish': False,
                     'verbose': True

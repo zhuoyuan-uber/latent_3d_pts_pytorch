@@ -124,23 +124,7 @@ class AutoEncoder(nn.Module):
             z = np.expand_dims(z, 0)
         
     def train(self, train_data, configuration):
-        c = configuration
-        stats = []
-
-        if c.saver_step is not None:
-            create_dir(c.train_dir)
-
-        for _ in range(c.training_epochs):
-            # loss, duration = self._single_epoch_train(train_data, c)
-            stats.append((epoch, loss, duration))
-
-            if epoch % c.loss_display_step == 0:
-                print("Epoch:", '%04d' % (epoch), 'training time (minutes)=', "{:.4f}".format(duration / 60.0), "loss=", "{:.9f}".format(loss))
-                if log_file is not None:
-                    log_file.write('%04d\t%.9f\t%.4f\n' % (epoch, loss, duration / 60.0))
-
-            # Save the models checkpoint periodically.
-        return stats
+        pass
     
     def evaluate(self, in_data, configuration, ret_pre_augmentation=False):
         pass
