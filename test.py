@@ -10,7 +10,7 @@ chamfer_dist = ChamferDistance()
 
 def my_loss(loss, pc1, pc2, print_flag=False):
     dist1, dist2 = loss(pc1, pc2)
-    l = (torch.sum(dist1)) + (torch.sum(dist2))
+    l = torch.sum(dist1) + torch.sum(dist2)
     if print_flag:
         # print('dist1', dist1)
         # print('dist2', dist2)
@@ -24,8 +24,10 @@ if __name__ == "__main__":
     random.seed(100)
     np.random.seed(100)
 
-    xyz1 = np.random.randn(32, 16384, 3).astype('float32')
-    xyz2 = np.random.randn(32, 1024, 3).astype('float32')
+    # xyz1 = np.random.randn(32, 16384, 3).astype('float32')
+    # xyz2 = np.random.randn(32, 1024, 3).astype('float32')
+    xyz1 = np.random.randn(1, 15, 3).astype('float32')
+    xyz2 = np.random.randn(1, 10, 3).astype('float32')
     # confirm 1: random points are the same (done)
     # print('xyz1', xyz1)
     # print('xyz2', xyz2)
@@ -48,7 +50,12 @@ if __name__ == "__main__":
     # confirm 3: backward
     pc1.requires_grad = True
     pc2.requires_grad = True
-    optimizer = optim.SGD([pc1, pc2], lr=.01) # , momentum=.9)
+    dist1, dist2, l = my_loss(cd, pc1, pc2, False)
+    l.backward()
+    print('gradient 1:', pc1.grad)
+    print('gradient 2:', pc2.grad)
+
+    optimizer = optim.SGD([pc1, pc2], lr=.05) # , momentum=.9)
 
     for epoch in range(100):
         optimizer.zero_grad()

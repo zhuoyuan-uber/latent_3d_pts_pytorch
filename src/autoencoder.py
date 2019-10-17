@@ -9,7 +9,6 @@ import os.path as osp
 import numpy as np
 import torch
 from torch import nn
-# from tflearn import is_training
 
 from . in_out import create_dir, pickle_data, unpickle_data
 from . general_utils import apply_augmentations, iterate_in_chunks
@@ -18,7 +17,7 @@ from . neural_net import Neural_Net, MODEL_SAVER_ID
 
 class Configuration():
     def __init__(self, n_input, encoder, decoder, encoder_args={}, decoder_args={},
-                 training_epochs=200, batch_size=10, learning_rate=0.001, denoising=False,
+                 training_epochs=200, batch_size=10, learning_rate=0.001, weight_decay=0., denoising=False,
                  saver_step=None, train_dir=None, z_rotate=False, loss='chamfer', gauss_augment=None,
                  saver_max_to_keep=None, loss_display_step=1, debug=False,
                  n_z=None, n_output=None, latent_vs_recon=1.0, consistent_io=None):
@@ -35,6 +34,7 @@ class Configuration():
         # Training related parameters
         self.batch_size = batch_size
         self.learning_rate = learning_rate
+        self.weight_decay = weight_decay
         self.loss_display_step = loss_display_step
         self.saver_step = saver_step
         self.train_dir = train_dir
@@ -83,11 +83,11 @@ class Configuration():
 
 
 class AutoEncoder(nn.Module):
-    def __init__(self, configuration):
+    def __init__(self, args):
         super().__init__()
-        self.is_denoising = configuration.is_denoising
-        self.n_input = configuration.n_input
-        self.n_output = configuration.n_output
+        self.is_denoising = args.is_denoising
+        self.n_input = args.n_input
+        self.n_output = args.n_output
 
         in_shape = [None] + self.n_input
         out_shape = [None] + self.n_output
@@ -122,11 +122,8 @@ class AutoEncoder(nn.Module):
     def decode(self, z):
         if np.ndim(z) == 1:  # single example
             z = np.expand_dims(z, 0)
-        
-    def train(self, train_data, configuration):
-        pass
     
-    def evaluate(self, in_data, configuration, ret_pre_augmentation=False):
+    def evaluate(self, in_data, args, ret_pre_augmentation=False):
         pass
     
     def embedding_at_tensor(self, dataset, conf, feed_original=True, apply_augmentation=False, tensor_name='bottleneck'):

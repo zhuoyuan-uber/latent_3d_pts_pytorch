@@ -14,14 +14,6 @@ import warnings
 
 from .torch_utils import replicate_parameter_for_all_layers
 
-"""
-from tflearn.layers.core import fully_connected, dropout
-from tflearn.layers.conv import conv_1d, avg_pool_1d
-from tflearn.layers.normalization import batch_normalization
-from tflearn.layers.core import fully_connected, dropout
-
-from . tf_utils import expand_scope_by_name, replicate_parameter_for_all_layers
-"""
 
 class conv1d_op(nn.Module):
     def __init__(self, nb_in, nb_out, n_filter, stride=1, b_norm=True, non_linear=F.relu):
@@ -116,18 +108,19 @@ class decoder_with_fc_only(nn.Module):
             layers.append(linear_op(nb_in, nb_out, 'xavier', b_norm, non_linearity))
 
             if dropout_prob is not None and dropout_prob[i] > 0:
-                layer = dropout(layer, 1.0 - dropout_prob[i])
+                layers.append(nn.Dropout(1.0 - dropout_prob[i]))
         
         # Last decoding layer never has a non-linearity.
         #TODO: how to set weight init as Xavier? weight decay? regularizer?
-        self.last_layer = nn.Linear(layer_sizes[-2], layer_sizes[-1])
-        nn.init.xavier_uniform_(self.last_layer.weight)
+        last_layer = nn.Linear(layer_sizes[-2], layer_sizes[-1])
+        nn.init.xavier_uniform_(last_layer.weight)
+        layers.append(last_layer)
 
         self.decoder = nn.Sequential(*layers)
 
     def forward(self, x):
         x = self.decoder(x)
-        return self.last_layer(x)            
+        return x           
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ Created on August 28, 2017
 import os.path as osp
 import torch
 from torch import nn
-# import tensorflow as tf
+
 
 MODEL_SAVER_ID = 'models.ckpt'
 
