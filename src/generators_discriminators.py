@@ -12,7 +12,7 @@ import torch.nn.functional as F
 # from tflearn.layers.normalization import batch_normalization
 # from tflearn.layers.core import fully_connected, dropout
 
-from . encoders_decoders import encoder_with_convs_and_symmetry, decoder_with_fc_only
+from .encoders_decoders import encoder_with_convs_and_symmetry, decoder_with_fc_only
 # from . tf_utils import leaky_relu
 # from . tf_utils import expand_scope_by_name
 
@@ -30,8 +30,9 @@ class mlp_discriminator(nn.Module):
     def forward(self, x):
         x = self.conv_base(x)
         d_logit = self.dis(x) # (?, 1)
-        d_prob = torch.sigmoid(d_logit) # (?, 1)
-        return d_prob, d_logit
+        # d_prob = torch.sigmoid(d_logit) # (?, 1)
+        # return d_prob, d_logit
+        return d_logit
 
 
 class point_cloud_generator(nn.Module):
@@ -59,6 +60,19 @@ class point_cloud_generator(nn.Module):
         x = self.last_layer(x)
         x = x.view(x.shape[0], 3, -1)
         return x
+
+
+if __name__ == "__main__":
+    noise = torch.randn(20, 128)
+    generator = point_cloud_generator(128, [3, 2048], [64, 128, 512, 1024])
+    out = generator(noise)
+    print(out.shape)
+
+    pts = torch.randn(20, 3, 2048)
+    discriminator = mlp_discriminator(b_norm=False)
+    out1, out2 = discriminator(pts)
+    print(out1.shape, out2.shape)
+
 
 """
 def convolutional_discriminator(in_signal, non_linearity=tf.nn.relu,

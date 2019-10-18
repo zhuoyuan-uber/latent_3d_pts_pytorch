@@ -131,7 +131,7 @@ if __name__ == "__main__":
         test(test_loader, ae, args)
 
         if epoch % args.saver_step == 0:
-            torch.save(ae.state_dict(), osp.join(args.train_dir, "model%d.pth" % epoch))
+            torch.save(ae.state_dict(), osp.join(train_dir, "model%d.pth" % epoch))
 
     """
     buf_size = 1 # Make 'training_stats' file to flush each output line regarding training.
