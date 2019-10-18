@@ -112,6 +112,16 @@ def train(train_loader, discriminator, generator, optD, optG, epoch, noise_param
     return epoch_loss_d, epoch_loss_g
 
 
+def generate(generator, noise_params):
+    generator.eval()
+    z = sample_noise(10, noise_params)
+    fake_data = generator(z).detach()
+    fake_data = fake_data.cpu().numpy()
+    for i in range(10):
+        tmp = fake_data[i,:,:]
+        plot_3d_point_cloud(tmp[0,:], tmp[1,:], tmp[2,:], in_u_sphere=True)
+
+
 if __name__ == "__main__":
     # Use to save Neural-Net check-points etc.
     top_out_dir = './data/'
@@ -197,10 +207,15 @@ if __name__ == "__main__":
     opt_g = torch.optim.Adam(generator.parameters(), init_lr, betas=betas)
     # .minimize(loss, var_list=var_list)
 
+    generator.load_state_dict(torch.load(osp.join(train_dir, "model%d.pth" % 40)))
+    generate(generator, noise_params)
+
+    """
     for epoch in range(n_epochs):
         train(train_loader, discriminator, generator, opt_d, opt_g, epoch, noise_params)
         if epoch % 10 == 0:
             torch.save(generator.state_dict(), osp.join(train_dir, "model%d.pth" % epoch))
+    """
     exit()
 
     if plot_train_curve:
